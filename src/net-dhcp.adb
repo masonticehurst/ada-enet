@@ -356,6 +356,9 @@ package body Net.DHCP is
 
       --  Option 255: End
       Packet.Put_Uint8 (OPT_END);
+      while Packet.Get_Data_Size (Net.Buffers.UDP_PACKET) < 300 loop
+         Packet.Put_Uint8 (0);
+      end loop;
    end Fill_Options;
 
    --  ------------------------------
