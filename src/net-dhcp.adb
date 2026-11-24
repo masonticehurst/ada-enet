@@ -315,7 +315,9 @@ package body Net.DHCP is
       end if;
 
       --  Option 54: DHCP Server Identifier.
-      if not (Request.Current in STATE_BOUND | STATE_RENEWING | STATE_REBINDING) then
+      if Kind /= DHCP_DISCOVER
+        and then not (Request.Current in STATE_BOUND | STATE_RENEWING | STATE_REBINDING)
+      then
          Packet.Put_Uint8 (54);
          Packet.Put_Uint8 (4);
          Packet.Put_Ip (Request.Server_Ip);
