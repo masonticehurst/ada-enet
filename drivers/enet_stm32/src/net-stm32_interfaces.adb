@@ -233,7 +233,7 @@ package body Net.STM32_Interfaces is
       procedure Transmit_Interrupt is
          Tx   : Tx_Ring_Access;
       begin
-         loop
+         while Tx_Space < Tx_Ring'Length loop
             Tx := Tx_Ring (Dma_Tx)'Access;
             Cortex_M.Cache.Invalidate_DCache (Tx.Desc'Address, Tx.Desc'Size / 8);
             exit when Tx.Desc.Tdes0.Own = 1;
@@ -242,8 +242,8 @@ package body Net.STM32_Interfaces is
             Net.Buffers.Release (Tx.Buffer);
             Tx_Space := Tx_Space + 1;
             Dma_Tx := Next_Tx (Dma_Tx);
-            exit when Dma_Tx = Cur_Tx;
          end loop;
+         Tx_Ready := Tx_Space > 0;
          Ethernet_DMA_Periph.DMATPDR := 1;
       end Transmit_Interrupt;
 
