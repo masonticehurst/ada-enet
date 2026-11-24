@@ -446,18 +446,21 @@ package body Net.STM32_Interfaces is
 
 
       procedure Interrupt is
+         Status : constant Net.STM32_SVD.Ethernet.DMASR_Register :=
+           Ethernet_DMA_Periph.DMASR;
       begin
-         if Ethernet_DMA_Periph.DMASR.RS then
-            Ethernet_DMA_Periph.DMASR := (RS => True, others => <>);
+         Ethernet_DMA_Periph.DMASR :=
+           (RS     => Status.RS,
+            TS     => Status.TS,
+            TBUS   => Status.TBUS,
+            NIS    => Status.NIS,
+            others => <>);
+         if Status.RS then
             Receive_Queue.Receive_Interrupt;
          end if;
-         if Ethernet_DMA_Periph.DMASR.TS then
-            Ethernet_DMA_Periph.DMASR := (TS => True, others => <>);
+         if Status.TS then
             Transmit_Queue.Transmit_Interrupt;
-         elsif Ethernet_DMA_Periph.DMASR.TBUS then
-            Ethernet_DMA_Periph.DMASR := (TBUS => True, others => <>);
          end if;
-         Ethernet_DMA_Periph.DMASR := (NIS => True, others => <>);
       end Interrupt;
 
       --  ------------------------------
